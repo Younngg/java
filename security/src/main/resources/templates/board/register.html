@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html layout:decorate="~{layout/basic.html}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/basic.html}">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <title>Board Register</title>
@@ -18,31 +19,31 @@
           <form action="/board/register" method="post">
             <div class="input-group mb-3">
               <span class="input-group-text">Title</span>
-              <input type="text" name="title" class="form-control" placeholder="Title">
+              <input class="form-control" name="title" placeholder="Title" type="text">
             </div>
 
             <div class="input-group mb-3">
               <span class="input-group-text">Content</span>
-              <textarea class="form-control col-sm-5" rows="5" name="content"></textarea>
+              <textarea class="form-control col-sm-5" name="content" rows="5"></textarea>
             </div>
 
             <div class="input-group mb-3">
               <span class="input-group-text">Writer</span>
-              <input type="text" name="writer" class="form-control" placeholder="Writer">
-
+              <input class="form-control" name="writer" placeholder="Writer" readonly
+                     th:value="${#authentication.principal.username}" type="text">
             </div>
 
             <div class="input-group mb-3">
               <span class="input-group-text">Images</span>
               <div class="float-end uploadHidden">
-                <button type="button" class="btn btn-primary uploadFileBtn">ADD Files</button>
+                <button class="btn btn-primary uploadFileBtn" type="button">ADD Files</button>
               </div>
             </div>
 
             <div class="my-4">
               <div class="float-end">
-                <button type="submit" class="btn btn-primary submitBtn">Submit</button>
-                <button type="reset" class="btn btn-secondary">Reset</button>
+                <button class="btn btn-primary submitBtn" type="submit">Submit</button>
+                <button class="btn btn-secondary" type="reset">Reset</button>
               </div>
             </div>
 
@@ -68,16 +69,16 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Upload File</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
         </div>
         <div class="modal-body">
           <div class="input-group mb-3">
-            <input type="file" name="files" class="form-control" multiple >
+            <input class="form-control" multiple name="files" type="file" >
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary uploadBtn">Upload</button>
-          <button type="button" class="btn btn-outline-dark closeUploadBtn" >Close</button>
+          <button class="btn btn-primary uploadBtn" type="button">Upload</button>
+          <button class="btn btn-outline-dark closeUploadBtn" type="button" >Close</button>
         </div>
       </div>
     </div>
@@ -91,6 +92,8 @@
 
 
 <script layout:fragment="script" th:inline="javascript">
+
+  const auth = [[${#authentication.principal}]]
 
   const errors = [[${errors}]]
   console.log(errors)

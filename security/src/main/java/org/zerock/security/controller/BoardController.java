@@ -1,8 +1,9 @@
 package org.zerock.security.controller;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.util.List;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -14,13 +15,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.zerock.security.dto.*;
+import org.zerock.security.dto.BoardDTO;
+import org.zerock.security.dto.BoardListAllDTO;
+import org.zerock.security.dto.PageRequestDTO;
+import org.zerock.security.dto.PageResponseDTO;
 import org.zerock.security.service.BoardService;
 
 import jakarta.validation.Valid;
-import java.io.File;
-import java.nio.file.Files;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Controller
 @RequestMapping("/board")
@@ -28,10 +31,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoardController {
 
+    private final BoardService boardService;
     @Value("${org.zerock.upload.path}")// import 시에 springframework으로 시작하는 Value
     private String uploadPath;
-
-    private final BoardService boardService;
 
 //    @GetMapping("/list")
 //    public void list(PageRequestDTO pageRequestDTO, Model model){
@@ -56,7 +58,6 @@ public class BoardController {
 //
 //        model.addAttribute("responseDTO", responseDTO);
 //    }
-
 
     @GetMapping("/list")
     public void list(PageRequestDTO pageRequestDTO, Model model){
@@ -110,6 +111,7 @@ public class BoardController {
 //    }
 
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping({"/read", "/modify"})
     public void read(Long bno, PageRequestDTO pageRequestDTO, Model model){
 
@@ -121,6 +123,7 @@ public class BoardController {
 
     }
 
+    @PreAuthorize("principal.username == #boardDTO.writer")
     @PostMapping("/modify")
     public String modify( @Valid BoardDTO boardDTO,
                           BindingResult bindingResult,
@@ -164,7 +167,7 @@ public class BoardController {
 //
 //    }
 
-
+    @PreAuthorize("principal.username == #boardDTO.writer")
     @PostMapping("/remove")
     public String remove(BoardDTO boardDTO, RedirectAttributes redirectAttributes) {
 

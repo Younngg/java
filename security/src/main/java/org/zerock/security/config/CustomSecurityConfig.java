@@ -1,18 +1,21 @@
 package org.zerock.security.config;
 
-import static org.springframework.security.config.Customizer.*;
+import javax.sql.DataSource;
 
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.zerock.security.security.CustomUserDetailsService;
+import org.zerock.security.security.handler.Custom403Handler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +25,9 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true)
 public class CustomSecurityConfig {
+
+	private final DataSource dataSource;
+	private final CustomUserDetailsService userDetailsService;
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -41,7 +47,25 @@ public class CustomSecurityConfig {
 			.permitAll()
 		);
 
+		http.csrf(auth -> auth.disable());
+
+		http.rememberMe(rememberMe -> rememberMe
+			.key("12345678")
+			.tokenRepository(persistentTokenRepository())
+			.userDetailsService(userDetailsService)
+			.tokenValiditySeconds(60*60*24*30)
+		);
+
+		http.exceptionHandling(exception -> exception
+			.accessDeniedHandler(accessDeniedHandler())
+		);
+
 		return http.build();
+	}
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		return new Custom403Handler();
 	}
 
 	@Bean
@@ -51,11 +75,11 @@ public class CustomSecurityConfig {
 		return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 	}
 
-	// @Bean
-	// public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-	// 	log.info("------------------configure--------------");
-	//
-	// 	return http.build();
-	// }
+	@Bean
+	public PersistentTokenRepository persistentTokenRepository() {
+		JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
+		repo.setDataSource(dataSource);
+		return repo;
+	}
 
 }

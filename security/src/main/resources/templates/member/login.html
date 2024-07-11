@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" />
+    <title>Simple Sidebar - Login</title>
+    <!-- Favicon-->
+    <link rel="icon" th:href="@{/assets/favicon.ico}" type="image/x-icon" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+<body class="align-middle" >
+<div class="container-fluid d-flex justify-content-center" style="height: 100vh">
+    <div class="card align-self-center">
+        <div class="card-header">
+            LOGIN Page
+        </div>
+        <div class="card-body">
+            <th:block th:if="${param.logout != null}">
+                <h1>Logout........</h1>
+            </th:block>
+            <th:block th:if="${param.logout == null}">
+                <form action="/member/login" id="registerForm" method="post">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">아이디</span>
+                        <input class="form-control" name="username" placeholder="USER ID" type="text">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">패스워드</span>
+                        <input class="form-control" name="password" placeholder="PASSWORD" type="text">
+                    </div>
+                    <div class="input-group mb-3 ">
+                        <input class="form-check-input" name="remember-me" type="checkbox">
+                        <label class="form-check-label">
+                            자동 로그인
+                        </label>
+                    </div>
+                    <div class="my-4">
+                        <div class="float-end">
+                            <button class="btn btn-primary submitBtn" type="submit">LOGIN</button>
+                        </div>
+                    </div>
+                </form>
+            </th:block>
+        </div><!--end card body-->
+    </div><!--end card-->
+</div>
+</body>
+</html>
