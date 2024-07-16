@@ -60,6 +60,10 @@ public class CustomSecurityConfig {
 			.accessDeniedHandler(accessDeniedHandler())
 		);
 
+		http.oauth2Login(oauth2 -> oauth2
+			.loginPage("/member/login")
+		);
+
 		return http.build();
 	}
 
